@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Атрибуційний код картини</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jetbrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --ink:#1c1a16;
+    --parchment:#ece5d3;
+    --parchment-dim:#d9cfb4;
+    --seal:#7a2e2e;
+    --seal-bright:#9c3b3b;
+    --gold:#b8965a;
+    --line: rgba(184,150,90,0.35);
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at top left, rgba(184,150,90,0.06), transparent 60%),
+      var(--ink);
+    color:var(--parchment);
+    font-family:'Cormorant Garamond', serif;
+    display:flex;
+    justify-content:center;
+    padding:48px 20px;
+  }
+
+  .sheet{
+    width:100%;
+    max-width:620px;
+  }
+
+  .eyebrow{
+    font-family:'Jetbrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.28em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:10px;
+  }
+
+  h1{
+    font-weight:500;
+    font-size:38px;
+    line-height:1.15;
+    margin:0 0 6px;
+    color:var(--parchment);
+  }
+
+  .sub{
+    font-size:17px;
+    color:var(--parchment-dim);
+    font-style:italic;
+    margin:0 0 36px;
+    max-width:46ch;
+  }
+
+  .card{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    padding:32px;
+    position:relative;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    inset:6px;
+    border:1px solid rgba(184,150,90,0.15);
+    pointer-events:none;
+  }
+
+  label{
+    display:block;
+    font-family:'Jetbrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:8px;
+  }
+
+  .field{
+    margin-bottom:22px;
+  }
+
+  .field-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+  }
+
+  input{
+    width:100%;
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--line);
+    color:var(--parchment);
+    font-family:'Cormorant Garamond', serif;
+    font-size:20px;
+    padding:6px 2px 10px;
+    outline:none;
+    transition:border-color 0.25s ease;
+  }
+  input::placeholder{ color:rgba(236,229,211,0.28); font-style:italic; }
+  input:focus{ border-bottom-color:var(--gold); }
+
+  .hint{
+    font-family:'Jetbrains Mono', monospace;
+    font-size:11px;
+    color:rgba(236,229,211,0.4);
+    margin-top:6px;
+    letter-spacing:0.02em;
+  }
+
+  button{
+    width:100%;
+    margin-top:8px;
+    padding:15px;
+    background:var(--seal);
+    color:var(--parchment);
+    border:1px solid var(--seal-bright);
+    font-family:'Jetbrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:background 0.25s ease, transform 0.15s ease;
+  }
+  button:hover{ background:var(--seal-bright); }
+  button:active{ transform:scale(0.995); }
+  button:disabled{ opacity:0.35; cursor:not-allowed; }
+
+  .result{
+    margin-top:30px;
+    display:none;
+    animation: rise 0.5s ease forwards;
+  }
+  .result.show{ display:block; }
+
+  @keyframes rise{
+    from{ opacity:0; transform:translateY(8px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .seal-wrap{
+    display:flex;
+    align-items:center;
+    gap:24px;
+    padding-top:26px;
+    border-top:1px solid var(--line);
+  }
+
+  .seal-mark{
+    flex:0 0 auto;
+    width:72px;
+    height:72px;
+    border-radius:50%;
+    border:2px solid var(--gold);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  .seal-mark::before{
+    content:"";
+    position:absolute;
+    inset:6px;
+    border:1px solid rgba(184,150,90,0.5);
+    border-radius:50%;
+  }
+  .seal-mark span{
+    font-family:'Jetbrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.05em;
+    color:var(--gold);
+  }
+
+  .code-block{
+    flex:1;
+  }
+
+  .code-label{
+    font-family:'Jetbrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:rgba(236,229,211,0.45);
+    margin-bottom:6px;
+  }
+
+  .code-full{
+    font-family:'Jetbrains Mono', monospace;
+    font-size:26px;
+    letter-spacing:0.06em;
+    color:var(--parchment);
+    word-break:break-all;
+    cursor:pointer;
+    user-select:all;
+  }
+  .code-full .accent{ color:var(--gold); }
+
+  .copy-note{
+    font-family:'Jetbrains Mono', monospace;
+    font-size:10px;
+    color:rgba(184,150,90,0.7);
+    margin-top:8px;
+    height:14px;
+  }
+
+  .instructions{
+    margin-top:28px;
+    padding-top:20px;
+    border-top:1px dashed var(--line);
+    font-size:15px;
+    line-height:1.65;
+    color:var(--parchment-dim);
+  }
+  .instructions b{ color:var(--parchment); font-weight:600; }
+
+  .footnote{
+    margin-top:26px;
+    font-family:'Jetbrains Mono', monospace;
+    font-size:10.5px;
+    line-height:1.7;
+    color:rgba(236,229,211,0.38);
+    letter-spacing:0.01em;
+  }
+
+  @media (max-width:480px){
+    .field-row{ grid-template-columns:1fr; gap:0; }
+    h1{ font-size:30px; }
+    .code-full{ font-size:20px; }
+    .seal-wrap{ flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <div class="eyebrow">Атрибуційний реєстр · Провенанс</div>
+  <h1>Код автентифікації картини</h1>
+  <p class="sub">Введіть дані — ключ ніде не зберігається і не покидає цю сторінку.</p>
+
+  <div class="card">
+    <div class="field">
+      <label for="initials">Ініціали / підпис-код</label>
+      <input id="initials" type="text" placeholder="напр. ОК" maxlength="6">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="year">Рік створення</label>
+        <input id="year" type="text" placeholder="2026" maxlength="4" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="number">№ по порядку</label>
+        <input id="number" type="text" placeholder="047" maxlength="6" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="secret">Секретний ключ</label>
+      <input id="secret" type="password" placeholder="ваше приватне слово-пароль">
+      <div class="hint">Одне й те саме слово для всіх ваших картин. Запам'ятайте його — без нього код не відтворити.</div>
+    </div>
+
+    <button id="generate">Обчислити код</button>
+
+    <div class="result" id="result">
+      <div class="seal-wrap">
+        <div class="seal-mark"><span>СПРАВЖ.</span></div>
+        <div class="code-block">
+          <div class="code-label">Код для картини та сертифіката</div>
+          <div class="code-full" id="fullCode" title="Натисніть, щоб скопіювати"></div>
+          <div class="copy-note" id="copyNote"></div>
+        </div>
+      </div>
+
+      <div class="instructions">
+        <b>На картині</b> — напишіть код дрібно на звороті полотна або підрамнику.<br>
+        <b>На сертифікаті</b> — той самий код повністю, поряд із вашим підписом і датою.<br>
+        Останні 4 символи (після риски) — контрольна частина: якщо хтось спробує підробити етикетку, вона не збіжиться при перевірці за вашим ключем.
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote">
+    Обчислення відбувається локально у вашому браузері (SHA-256 через Web Crypto API). Дані нікуди не надсилаються.
+  </div>
+</div>
+
+<script>
+async function sha256Hex(message){
+  const enc = new TextEncoder().encode(message);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+const btn = document.getElementById('generate');
+const result = document.getElementById('result');
+const fullCode = document.getElementById('fullCode');
+const copyNote = document.getElementById('copyNote');
+
+btn.addEventListener('click', async () => {
+  const initials = document.getElementById('initials').value.trim().toUpperCase();
+  const year = document.getElementById('year').value.trim();
+  const number = document.getElementById('number').value.trim().padStart(3,'0');
+  const secret = document.getElementById('secret').value;
+
+  if(!initials || !year || !number || !secret){
+    copyNote.textContent = 'Заповніть усі поля.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Обчислюю…';
+
+  const payload = `${secret}|${initials}|${year}|${number}`;
+  const hash = await sha256Hex(payload);
+  const control = hash.slice(0,4).toUpperCase();
+
+  const code = `${initials}-${year}-${number}`;
+  fullCode.innerHTML = `${code}-<span class="accent">${control}</span>`;
+  result.classList.add('show');
+  copyNote.textContent = '';
+
+  btn.disabled = false;
+  btn.textContent = 'Обчислити код';
+});
+
+fullCode?.addEventListener?.('click', () => {});
+document.getElementById('fullCode').addEventListener('click', async (e) => {
+  const text = e.target.textContent;
+  try{
+    await navigator.clipboard.writeText(text);
+    copyNote.textContent = 'Скопійовано ✓';
+    setTimeout(()=> copyNote.textContent = '', 1800);
+  }catch(err){
+    copyNote.textContent = 'Виділіть і скопіюйте вручну.';
+  }
+});
+</script>
+
+</body>
+</html>
