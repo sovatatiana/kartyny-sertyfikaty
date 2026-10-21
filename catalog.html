@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="uk" data-title-key="titleCatalog">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Каталог картин — Tatiana Sova</title>
+<link rel="stylesheet" href="brand.css">
+</head>
+<body>
+
+<header class="topband">
+  <div class="lang"><button type="button" data-lang="uk">UA</button><button type="button" data-lang="en">EN</button></div>
+  <img src="logo.png" alt="Tatiana Sova">
+</header>
+
+<main class="wrap">
+  <div class="eyebrow" data-i18n="eyebrow"></div>
+  <h1 data-i18n="catalogH1"></h1>
+  <p class="sub" data-i18n="catalogSub"></p>
+  <a class="nav-link" href="index.html" data-i18n="toVerify"></a>
+  <div class="grid" id="grid"></div>
+</main>
+
+<script src="common.js"></script>
+<script>
+(function(){
+  const { t, esc, parseCSV, pick } = Site;
+  const grid = document.getElementById('grid');
+  let items = null, failed = false;
+
+  function render(){
+    if (failed){ grid.innerHTML = `<div class="empty">${esc(t('catalogFail'))}</div>`; return; }
+    if (!items){ grid.innerHTML = `<div class="empty">${esc(t('loading'))}</div>`; return; }
+    if (!items.length){ grid.innerHTML = `<div class="empty">${esc(t('empty'))}</div>`; return; }
+    grid.innerHTML = items.map(p => `
+      <div class="piece">
+        ${Site.photoUrl(p.photo) ? `<div class="photo" role="button" tabindex="0" aria-label="${esc(t('zoom'))}"><img class="art-img" src="${esc(Site.photoUrl(p.photo))}" alt="${esc(pick(p,'title'))}" loading="lazy"></div>` : `<div class="photo nophoto"><span class="placeholder">${esc(t('noPhoto'))}</span></div>`}
+        <div class="body">
+          <div class="title">${esc(pick(p,'title') || t('untitled'))}</div>
+          <div class="note">${esc(pick(p,'note'))}</div>
+          <div class="code">${esc(p.code)}</div>
+        </div>
+      </div>`).join('');
+    Site.hookImages(grid);
+  }
+  Site.onLang(render);
+  render();
+  fetch('paintings.csv?t=' + Date.now())
+    .then(r => { if(!r.ok) throw new Error(); return r.text(); })
+    .then(txt => { items = parseCSV(txt); })
+    .catch(() => { failed = true; })
+    .finally(render);
+})();
+</script>
+</body>
+</html>
